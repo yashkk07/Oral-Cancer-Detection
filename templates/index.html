@@ -4,6 +4,22 @@
   <meta charset="utf-8">
   <title>Oral Cancer Detector</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    html { scroll-behavior: smooth; }
+    .spinner {
+      border: 4px solid rgba(0,0,0,0.1);
+      border-top: 4px solid #4f46e5;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: auto;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg);}
+      100% { transform: rotate(360deg);}
+    }
+  </style>
 </head>
 <body class="bg-gray-100 font-sans">
 
@@ -14,6 +30,7 @@
       <nav>
         <a href="#" class="px-3 hover:underline">Home</a>
         <a href="#about" class="px-3 hover:underline">About</a>
+        <a href="#examples" class="px-3 hover:underline">Examples</a>
         <a href="#contact" class="px-3 hover:underline">Contact</a>
       </nav>
     </div>
@@ -27,36 +44,56 @@
   </section>
 
   <!-- Upload Section -->
-  <section id="upload" class="max-w-xl mx-auto mt-12 p-8 bg-white shadow-lg rounded-2xl">
-    <h3 class="text-2xl font-semibold text-gray-800 mb-6 text-center">Upload Histopathologic Image</h3>
-    
-    <form method="post" enctype="multipart/form-data" action="/predict" class="space-y-6">
+  <section id="upload" class="max-w-3xl mx-auto mt-12 p-8 bg-white shadow-lg rounded-2xl">
+    <h3 class="text-2xl font-semibold text-gray-800 mb-6 text-center">Upload Histopathologic Images</h3>
+
+    <form method="post" enctype="multipart/form-data" action="/predict" class="space-y-6" id="uploadForm">
       <!-- Drag & Drop Upload -->
       <label class="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition relative">
         <div class="flex flex-col items-center">
           <svg class="w-10 h-10 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                  d="M7 16V4a1 1 0 011-1h8a1 1 0 011 1v12m-4 4h.01M12 12v8m0 0H6a2 2 0 01-2-2V4a2 2 0 
-                  012-2h12a2 2 0 012 2v14a2 2 0 01-2 2h-6z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M7 16V4a1 1 0 011-1h8a1 1 0 011 1v12m-4 4h.01M12 12v8m0 0H6a2 2 0
+                  012-2V4a2 2 0 012-2h12a2 2 0 012 2v14a2 2 0 01-2 2h-6z"/>
           </svg>
           <p class="text-sm text-gray-500">Click to upload or drag and drop</p>
           <p class="text-xs text-gray-400 mt-1">JPG, PNG, or TIFF up to 10MB</p>
         </div>
-        <input type="file" name="file" class="hidden" id="fileInput" required>
+        <input type="file" name="file" class="hidden" id="fileInput" accept="image/*" multiple required>
       </label>
 
       <!-- Preview -->
-      <div id="preview" class="hidden mt-4 text-center">
-        <p class="text-sm text-gray-600 mb-2">Selected Image:</p>
-        <img id="previewImage" class="max-h-48 mx-auto rounded-lg shadow">
-      </div>
+      <div id="preview" class="hidden mt-4 grid grid-cols-2 gap-4"></div>
 
       <!-- Submit -->
       <div class="text-center">
-        <input type="submit" value="Predict" 
+        <button type="submit"
                class="bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700 shadow-md cursor-pointer transition">
+          Predict
+        </button>
       </div>
     </form>
+
+    <!-- Spinner -->
+    <div id="loading" class="hidden mt-6 text-center">
+      <div class="spinner"></div>
+      <p class="text-gray-600 mt-2">Analyzing images, please wait...</p>
+    </div>
+
+    <!-- Result -->
+    <div id="result" class="hidden mt-6 text-center bg-gray-50 p-6 rounded-lg shadow">
+      <h4 class="text-xl font-bold text-gray-800 mb-2">Prediction Result</h4>
+      <p id="resultText" class="text-gray-700"></p>
+      <p id="confidenceText" class="text-sm text-gray-500 mt-2"></p>
+
+      <!-- Heatmap placeholder -->
+      <div class="mt-4">
+        <p class="text-sm text-gray-500">Model Attention (Heatmap visualization):</p>
+        <div class="w-full h-48 bg-gray-200 flex items-center justify-center rounded-lg">
+          <span class="text-gray-500">[Heatmap will be displayed here]</span>
+        </div>
+      </div>
+    </div>
   </section>
 
   <!-- About Section -->
@@ -69,31 +106,98 @@
     </p>
   </section>
 
+  <!-- Example Images -->
+  <section id="examples" class="max-w-5xl mx-auto mt-12 p-8">
+    <h3 class="text-2xl font-bold text-gray-800 mb-4">Example Images</h3>
+    <div class="grid grid-cols-2 md:grid-cols-2 gap-6">
+      <div class="text-center">
+        <img src="https://storage.googleapis.com/kagglesdsdata/datasets/1482677/2449781/test/Normal/Normal_400x_149.jpg?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=databundle-worker-v2%40kaggle-161607.iam.gserviceaccount.com%2F20250912%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20250912T053516Z&X-Goog-Expires=345600&X-Goog-SignedHeaders=host&X-Goog-Signature=4d0b12ca3fc27f0a16fd4577ae4812d26d8700cd7b7df39436df78adfa007bd8a2532ec3b260db2dd88f8555aefa6ea7b21fd3caba075c5c0f2f029b28643a4ed868b182cf96cf558f454c4c72ce536fb9e74b1bafa563f3f1e8bd5da2e04ca424029f924ae6e02bb5bc153a139555b94370935e3b6667e145e5624124be2e5a12a44369937d16c38a1684443a18595b83e693005235de9f7597c23b7d431af70894a0b32127332695c236960bcb37c88842bae39e2c3479524f54618d1fc626de01f46322ddd02c059c37a3d2dd86eb741092ade8bc9d4f19e09fd7bc4f5f5d13f9b4698ceb7fe15290363120b92d568e4451ebe7f6188714be7e9a980ca44a" class="rounded-lg shadow">
+        <p class="mt-2 text-sm text-gray-600">Healthy Tissue</p>
+      </div>
+      <div class="text-center">
+        <img src="https://storage.googleapis.com/kagglesdsdata/datasets/1482677/2449781/test/OSCC/OSCC_400x_101.jpg?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=databundle-worker-v2%40kaggle-161607.iam.gserviceaccount.com%2F20250914%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20250914T071541Z&X-Goog-Expires=345600&X-Goog-SignedHeaders=host&X-Goog-Signature=2f7dd1830ef85d0be8c0a69d537f17017ce021159a46b1b7d7c9c7d51a52091a1d981971aea901fab9aea183b43208af5fbd75d4d8a24dc72ff7239e30f2fb6afa9777629f55ec8d7e2d4236e5b24cf841fc68c713d422c871661cab66e4ed5f17bc920e380f521d11a95c69f648ef5a303e02136e361f10782e1a1c5847046953cd121ae3a77525fa92ad8f4107ffa37bf60902745f720c55abeaaee3e8b9417f204ed3af2ea518c539583be5abcdb8d7f99445f14141b39189e4480f1483043561150df4f74127ad4ea864fdaad28f4e7b61bb6537cdc0627da2e25ec10804951950f3ffc1f0a9631479117d2eb71ba9103066386a9a3c45084d42ec2b1639" class="rounded-lg shadow">
+        <p class="mt-2 text-sm text-gray-600">Oral Cancer Tissue</p>
+      </div>
+{#      <div class="text-center">#}
+{#        <img src="https://via.placeholder.com/150" class="rounded-lg shadow">#}
+{#        <p class="mt-2 text-sm text-gray-600">Precancerous Lesion</p>#}
+{#      </div>#}
+{#      <div class="text-center">#}
+{#        <img src="https://via.placeholder.com/150" class="rounded-lg shadow">#}
+{#        <p class="mt-2 text-sm text-gray-600">Benign Tissue</p>#}
+{#      </div>#}
+    </div>
+  </section>
+
   <!-- Footer -->
   <footer id="contact" class="bg-gray-800 text-gray-300 mt-16 py-6">
     <div class="max-w-5xl mx-auto px-6 text-center">
       <p>© 2025 Oral Cancer Detector. All rights reserved.</p>
-      <p class="mt-2">Contact: support@oralcancerdetector.org</p>
+      <p class="mt-2">Contact: ykarnani@gitam.in</p>
     </div>
   </footer>
 
-  <!-- JS for Preview -->
-  <script>
-    const fileInput = document.getElementById('fileInput');
-    const preview = document.getElementById('preview');
-    const previewImage = document.getElementById('previewImage');
+  <!-- JS -->
+    <script>
+      const fileInput = document.getElementById('fileInput');
+      const preview = document.getElementById('preview');
+      const loading = document.getElementById('loading');
+      const result = document.getElementById('result');
+      const resultText = document.getElementById('resultText');
+      const confidenceText = document.getElementById('confidenceText');
+      const form = document.getElementById('uploadForm');
 
-    fileInput.addEventListener('change', function() {
-      const file = this.files[0];
-      if (file) {
-        preview.classList.remove('hidden');
-        previewImage.src = URL.createObjectURL(file);
-      } else {
-        preview.classList.add('hidden');
-        previewImage.src = "";
-      }
-    });
-  </script>
+      // Preview selected image
+      fileInput.addEventListener('change', function () {
+        preview.innerHTML = "";
+        if (this.files.length > 0) {
+          preview.classList.remove('hidden');
+          Array.from(this.files).forEach(file => {
+            const img = document.createElement('img');
+            img.src = URL.createObjectURL(file);
+            img.className = "max-h-40 w-full object-cover rounded-lg shadow";
+            preview.appendChild(img);
+          });
+        } else {
+          preview.classList.add('hidden');
+        }
+      });
+
+      // Handle form submit
+      form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        loading.classList.remove('hidden');
+        result.classList.add('hidden');
+
+        const formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+
+        try {
+          const response = await fetch('/predict', {
+            method: 'POST',
+            body: formData
+          });
+
+          const data = await response.json();
+          loading.classList.add('hidden');
+          result.classList.remove('hidden');
+
+          if (data.error) {
+            resultText.innerText = "Error: " + data.error;
+            confidenceText.innerText = "";
+          } else {
+            resultText.innerText = `Prediction: ${data.prediction}`;
+            confidenceText.innerText = `Confidence: ${(data.confidence * 100).toFixed(2)}%`;
+          }
+        } catch (error) {
+          loading.classList.add('hidden');
+          result.classList.remove('hidden');
+          resultText.innerText = "Error: Unable to connect to server.";
+          confidenceText.innerText = "";
+        }
+      });
+    </script>
+
 
 </body>
 </html>
