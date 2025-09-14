@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Oral Cancer Detector</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+
+  <!-- Header -->
+  <header class="bg-indigo-700 text-white py-6 shadow-md">
+    <div class="max-w-5xl mx-auto px-6 flex justify-between items-center">
+      <h1 class="text-2xl font-bold">Oral Cancer Detector</h1>
+      <nav>
+        <a href="#" class="px-3 hover:underline">Home</a>
+        <a href="#about" class="px-3 hover:underline">About</a>
+        <a href="#contact" class="px-3 hover:underline">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="text-center py-16 bg-gradient-to-r from-indigo-700 to-purple-600 text-white">
+    <h2 class="text-4xl font-bold mb-4">AI-Powered Oral Cancer Detection</h2>
+    <p class="text-lg mb-6">Upload your histopathologic images for instant analysis and early detection assistance.</p>
+    <a href="#upload" class="bg-white text-indigo-700 font-semibold px-6 py-3 rounded-lg shadow hover:bg-gray-100 transition">Get Started</a>
+  </section>
+
+  <!-- Upload Section -->
+  <section id="upload" class="max-w-xl mx-auto mt-12 p-8 bg-white shadow-lg rounded-2xl">
+    <h3 class="text-2xl font-semibold text-gray-800 mb-6 text-center">Upload Histopathologic Image</h3>
+    
+    <form method="post" enctype="multipart/form-data" action="/predict" class="space-y-6">
+      <!-- Drag & Drop Upload -->
+      <label class="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition relative">
+        <div class="flex flex-col items-center">
+          <svg class="w-10 h-10 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M7 16V4a1 1 0 011-1h8a1 1 0 011 1v12m-4 4h.01M12 12v8m0 0H6a2 2 0 01-2-2V4a2 2 0 
+                  012-2h12a2 2 0 012 2v14a2 2 0 01-2 2h-6z"/>
+          </svg>
+          <p class="text-sm text-gray-500">Click to upload or drag and drop</p>
+          <p class="text-xs text-gray-400 mt-1">JPG, PNG, or TIFF up to 10MB</p>
+        </div>
+        <input type="file" name="file" class="hidden" id="fileInput" required>
+      </label>
+
+      <!-- Preview -->
+      <div id="preview" class="hidden mt-4 text-center">
+        <p class="text-sm text-gray-600 mb-2">Selected Image:</p>
+        <img id="previewImage" class="max-h-48 mx-auto rounded-lg shadow">
+      </div>
+
+      <!-- Submit -->
+      <div class="text-center">
+        <input type="submit" value="Predict" 
+               class="bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700 shadow-md cursor-pointer transition">
+      </div>
+    </form>
+  </section>
+
+  <!-- About Section -->
+  <section id="about" class="max-w-4xl mx-auto mt-16 p-8">
+    <h3 class="text-2xl font-bold text-gray-800 mb-4">About This Tool</h3>
+    <p class="text-gray-600 leading-relaxed">
+      Our AI model is designed to assist pathologists and researchers by analyzing histopathologic images
+      and predicting potential signs of oral cancer. It is not a substitute for medical diagnosis but a
+      supportive tool for research and clinical workflows.
+    </p>
+  </section>
+
+  <!-- Footer -->
+  <footer id="contact" class="bg-gray-800 text-gray-300 mt-16 py-6">
+    <div class="max-w-5xl mx-auto px-6 text-center">
+      <p>© 2025 Oral Cancer Detector. All rights reserved.</p>
+      <p class="mt-2">Contact: support@oralcancerdetector.org</p>
+    </div>
+  </footer>
+
+  <!-- JS for Preview -->
+  <script>
+    const fileInput = document.getElementById('fileInput');
+    const preview = document.getElementById('preview');
+    const previewImage = document.getElementById('previewImage');
+
+    fileInput.addEventListener('change', function() {
+      const file = this.files[0];
+      if (file) {
+        preview.classList.remove('hidden');
+        previewImage.src = URL.createObjectURL(file);
+      } else {
+        preview.classList.add('hidden');
+        previewImage.src = "";
+      }
+    });
+  </script>
+
+</body>
+</html>
